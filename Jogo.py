@@ -4,7 +4,10 @@ import os
 import sys
 
 pygame.init()
-surf= pygame.display.set_mode([1360,720])
+WIDTH=1360
+HEIGHT= 720
+
+surf= pygame.display.set_mode([WIDTH,HEIGHT])
 surf.fill([0,150,0])
 
 #colocar paredes
@@ -57,23 +60,102 @@ surf.blit(porta, posicao_porta)
 #Movimento do personagem
 movimento=[0,0]
 personagem=pygame.image.load("Raposa_frente.gif")
-surf.blit(personagem, movimento)
+#surf.blit(personagem, movimento)
+class Raposa(pygame.sprite.Sprite):
+    def __init__(self, img):
+        # Construtor da classe mãe (Sprite).
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = 0
+        self.rect.top = 0
+        self.speedx = 0
+        self.speedy= 0
+
+    def update(self):
+        # Atualização da posição da nave
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+
+        # Mantem dentro da tela
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > HEIGHT:
+            self.rect.bottom = HEIGHT
+
 #____________________________
 pygame.display.update()
 clock= pygame.time.Clock()
+all_sprites = pygame.sprite.Group()
+player= Raposa(personagem)
+all_sprites.add(player)
+#delta = {"esquerda":0, "direita":0, "acima":0, "abaixo":0}
+
 while True:
-    time=clock.tick(60)
-    evento=pygame.event.get()
-    if evento:
-        print(evento)
-    for e in evento:
-        if e.type == pygame.KEYDOWN:
-            if e.key == pygame.K_LEFT:
-                movimento[0]+= -1
-            elif e.key == pygame.K_RIGHT:
-                movimento[0]+=1
-            elif e.key == pygame.K_UP:
-                movimento[1]+=1
-            elif e.key == pygame.K_DOWN:
-                movimento[1]+= -1
+    eventos = pygame.event.get()
+    for evento in eventos:
+        if evento.type == pygame.QUIT: #or (evento.type == pygame.KEYDOWN and evento.key == pygame.K_ESCAPE):
+            pygame.quit() # terminado a aplicação pygame
+            sys.exit()    # sai pela rotina do sistema
+            
+        if evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_LEFT:
+                player.speedx -= 10
+                #delta["esquerda"] = 1
+            elif evento.key == pygame.K_RIGHT:
+                player.speedx+=10
+                #delta["direita"] = 1
+            elif evento.key == pygame.K_UP:
+                player.speedy -= 10
+                
+                #delta["acima"] = 1
+            elif evento.key == pygame.K_DOWN:
+                player.speedy += 10
+                
+                #delta["abaixo"] = 1
+            ''' elif evento.key == pygame.K_SPACE:
+                clique = True'''
+
+        if evento.type == pygame.KEYUP:
+            if evento.key == pygame.K_LEFT:
+                player.speedx += 10
+                #delta["esquerda"] = 0
+            if evento.key == pygame.K_RIGHT:
+                player.speedx -= 10
+                #delta["direita"] = 0
+            elif evento.key == pygame.K_UP:
+                player.speedy += 10
+                #delta["acima"] = 0
+            elif evento.key == pygame.K_DOWN:
+                player.speedy -= 10
+                
+                #delta["abaixo"] = 0
+            '''elif evento.key == pygame.K_SPACE:
+                clique = False'''
+    all_sprites.update()
+
+    # ----- Gera saídas
+    surf.fill((0,150,0))  # Preenche com a cor branca
+    #surf.blit(background, (0, 0))
+    # Desenhando meteoros
+    for f in a: #colocar as paredes nas posicoes
+        for j in b:
+            paredes = pygame.image.load("parede.png")
+            surf.blit(paredes, [f,j])
+    #for posicao in pos2:
+        #surf.blit(blocos, [posicao[0],posicao[1]])
+    all_sprites.draw(surf)
+
+    pygame.display.update()
+
+
+
+# O bloca esta na tela porem nao esta sendo mostrado
+# all.sprites sera usado para adicionar inimigos
+
 

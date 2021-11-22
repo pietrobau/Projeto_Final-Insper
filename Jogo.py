@@ -1,9 +1,11 @@
 import pygame
 import random
+import os
+import sys
 
 pygame.init()
 surf= pygame.display.set_mode([1360,720])
-surf.fill([0,0,0])
+surf.fill([0,150,0])
 
 #colocar paredes
 a = []
@@ -52,9 +54,26 @@ posicao_porta = random.choice(pos_bloco)
 porta = pygame.image.load("porta.png")
 surf.blit(porta, posicao_porta)
 #____________________________
+#Movimento do personagem
+movimento=[0,0]
+personagem=pygame.image.load("Raposa_frente.gif")
+surf.blit(personagem, movimento)
+#____________________________
 pygame.display.update()
-
+clock= pygame.time.Clock()
 while True:
+    time=clock.tick(60)
     evento=pygame.event.get()
     if evento:
         print(evento)
+    for e in evento:
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_LEFT:
+                movimento[0]+= -1
+            elif e.key == pygame.K_RIGHT:
+                movimento[0]+=1
+            elif e.key == pygame.K_UP:
+                movimento[1]+=1
+            elif e.key == pygame.K_DOWN:
+                movimento[1]+= -1
+

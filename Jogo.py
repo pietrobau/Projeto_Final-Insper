@@ -17,8 +17,11 @@ paredes = pygame.image.load("parede.png")
 blocos = pygame.image.load("bloco.png")
 personagem = pygame.image.load('Raposa_frente.gif').convert_alpha()
 jacare = pygame.image.load('jacaré.gif').convert_alpha()
+bomba = pygame.image.load('Bomba.png').convert_alpha()
+
 
 all_sprites_blocos = pygame.sprite.Group()
+all_sprites_bombas = pygame.sprite.Group()
 all_sprites_paredes = pygame.sprite.Group()
 all_player = pygame.sprite.Group()
 all_jacare = pygame.sprite.Group()
@@ -152,6 +155,68 @@ class Raposa(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
 
+class Ini(pygame.sprite.Sprite):
+    def __init__(self, img):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = ale[0] +40
+        self.rect.bottom = ale[1] -9
+        self.speedx = 3
+
+    def update(self):
+
+        for s in all_sprites_paredes:
+            if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                if self.rect.centerx-20 > s.rect.centerx+20:
+                    self.rect.left = s.rect.right
+                elif self.rect.centerx+20 < s.rect.centerx-20:
+                    self.rect.right = s.rect.left
+                elif self.rect.centery-20 < s.rect.centery+20:
+                    self.rect.bottom = s.rect.top
+                elif self.rect.centery+20 > s.rect.centery-20:
+                    self.rect.top = s.rect.bottom
+                self.speedx = -(self.speedx)
+        for s in all_sprites_blocos:
+            if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                if self.rect.centerx-20 > s.rect.centerx+20:
+                    self.rect.left = s.rect.right
+                elif self.rect.centerx+20 < s.rect.centerx-20:
+                    self.rect.right = s.rect.left
+                elif self.rect.centery-20 < s.rect.centery+20:
+                    self.rect.bottom = s.rect.top
+                elif self.rect.centery+20 > s.rect.centery-20:
+                    self.rect.top = s.rect.bottom
+                self.speedx = -(self.speedx)
+
+        self.rect.x += self.speedx
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+            self.speedx = -3
+        if self.rect.left < 0:
+            self.rect.left = 0
+            self.speedx = 3
+
+
+class Bomba(pygame.sprite.Sprite):
+    def __init__(self, img, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.centery = y
+        self.tempo = 30
+    def update(self):
+        self.tempo -= 1
+    def contagem (self):
+        if self.tempo <= 0:
+            self.rect.x -= self.rect.width*0.1
+            self.rect.y -= self.rect.height*0.1
+            self.rect.width *= 1.2
+            self.rect.height *= 1.2
+            
+
+
 
 player= Raposa(personagem)
 all_player.add(player)
@@ -176,53 +241,12 @@ while mob < level2:
     ale = random.choice(espaço_vazio)
     spal_jacare.append(ale)
 
-    class Ini(pygame.sprite.Sprite):
-        def __init__(self, img):
-            pygame.sprite.Sprite.__init__(self)
-            self.image = img
-            self.rect = self.image.get_rect()
-            self.rect.centerx = ale[0] +40
-            self.rect.bottom = ale[1] -9
-            self.speedx = 3
-
-        def update(self):
-
-            for s in all_sprites_paredes:
-                if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
-                    if self.rect.centerx-20 > s.rect.centerx+20:
-                        self.rect.left = s.rect.right
-                    elif self.rect.centerx+20 < s.rect.centerx-20:
-                        self.rect.right = s.rect.left
-                    elif self.rect.centery-20 < s.rect.centery+20:
-                        self.rect.bottom = s.rect.top
-                    elif self.rect.centery+20 > s.rect.centery-20:
-                        self.rect.top = s.rect.bottom
-                    self.speedx = -(self.speedx)
-            for s in all_sprites_blocos:
-                if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
-                    if self.rect.centerx-20 > s.rect.centerx+20:
-                        self.rect.left = s.rect.right
-                    elif self.rect.centerx+20 < s.rect.centerx-20:
-                        self.rect.right = s.rect.left
-                    elif self.rect.centery-20 < s.rect.centery+20:
-                        self.rect.bottom = s.rect.top
-                    elif self.rect.centery+20 > s.rect.centery-20:
-                        self.rect.top = s.rect.bottom
-                    self.speedx = -(self.speedx)
-
-            self.rect.x += self.speedx
-            if self.rect.right > WIDTH:
-                self.rect.right = WIDTH
-                self.speedx = -3
-            if self.rect.left < 0:
-                self.rect.left = 0
-                self.speedx = 3
+    
 
     pos_jacare.append(ale)
     inimigo= Ini(jacare)
     all_jacare.add(inimigo)
     mob += 1
-
 
 while game:
 
@@ -249,8 +273,9 @@ while game:
                 player.speedy += 10
                 
                 #delta["abaixo"] = 1
-            ''' elif evento.key == pygame.K_SPACE:
-                clique = True'''
+            elif evento.key == pygame.K_SPACE:
+                bomba2 = Bomba(bomba, player.rect.centerx, player.rect.centery)
+                all_sprites_bombas.add(bomba2)
 
         if evento.type == pygame.KEYUP:
             if evento.key == pygame.K_LEFT:
@@ -269,23 +294,33 @@ while game:
             '''elif evento.key == pygame.K_SPACE:
                 clique = False'''
     all_sprites_paredes.update()
+    all_sprites_bombas.update()
     all_sprites_blocos.update()
     all_player.update()
     all_jacare.update()
 
-    hits = pygame.sprite.spritecollide(player, all_jacare, True)
-    if len(hits) > 0:
+    for b in all_sprites_bombas.sprites():
+        b.contagem()
+
+    hits = pygame.sprite.groupcollide(all_sprites_bombas, all_sprites_blocos, False, False)
+    for b, blocos  in hits.items():
+        for bloco in blocos:
+            bloco.kill()
+        b.kill()
+
+    hits2 = pygame.sprite.spritecollide(player, all_jacare, True)
+    if len(hits2) > 0:
         game = False
 
-    # ----- Gera saídas
-    surf.fill((0,110,110))  # Preenche com a cor branca
-    #surf.blit(background, (0, 0))
-    # Desenhando meteoros
+
+    surf.fill((0,110,110))
+    
     for v in posicao_porta:
         porta = pygame.image.load("porta.png")
         surf.blit(porta, posicao_porta)
 
     all_sprites_paredes.draw(surf)
+    all_sprites_bombas.draw(surf)
     all_sprites_blocos.draw(surf)
     all_player.draw(surf)
     all_jacare.draw(surf)

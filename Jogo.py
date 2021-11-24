@@ -3,20 +3,23 @@ import random
 import os
 import sys
 
+from pygame import rect
+
 pygame.init()
 WIDTH=1360
 HEIGHT= 720
 game = True
-
+pygame.display.set_caption('BomberFox')
 surf= pygame.display.set_mode([WIDTH,HEIGHT])
-surf.fill([0,150,0])
+surf.fill([0,110,110])
 
 paredes = pygame.image.load("parede.png")
 blocos = pygame.image.load("bloco.png")
 personagem = pygame.image.load('Raposa_frente.gif').convert_alpha()
 jacare = pygame.image.load('jacaré.gif').convert_alpha()
 
-all_sprites = pygame.sprite.Group()
+all_sprites_blocos = pygame.sprite.Group()
+all_sprites_paredes = pygame.sprite.Group()
 all_player = pygame.sprite.Group()
 all_jacare = pygame.sprite.Group()
 
@@ -52,7 +55,7 @@ for x in a:
         pygame.display.update()
         clock= pygame.time.Clock()
         Paredes= Parede(paredes)
-        all_sprites.add(Paredes)
+        all_sprites_paredes.add(Paredes)
 #_____________________________
 #colocar blocos
 
@@ -91,7 +94,7 @@ for p in pos_bloco:
 
 
     Blocos = Bloco(blocos)
-    all_sprites.add(Blocos)
+    all_sprites_blocos.add(Blocos)
 #___________________________
 #posicionar porta da vitoria
 posicao_porta = random.choice(pos_bloco)
@@ -117,6 +120,28 @@ class Raposa(pygame.sprite.Sprite):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
 
+ 
+        for s in all_sprites_paredes:
+            if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                if self.rect.centerx-20 > s.rect.centerx+20:
+                    self.rect.left = s.rect.right
+                elif self.rect.centerx+20 < s.rect.centerx-20:
+                    self.rect.right = s.rect.left
+                elif self.rect.centery-20 < s.rect.centery+20:
+                    self.rect.bottom = s.rect.top
+                elif self.rect.centery+20 > s.rect.centery-20:
+                    self.rect.top = s.rect.bottom
+        for s in all_sprites_blocos:
+            if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                if self.rect.centerx-20 > s.rect.centerx+20:
+                    self.rect.left = s.rect.right
+                elif self.rect.centerx+20 < s.rect.centerx-20:
+                    self.rect.right = s.rect.left
+                elif self.rect.centery-20 < s.rect.centery+20:
+                    self.rect.bottom = s.rect.top
+                elif self.rect.centery+20 > s.rect.centery-20:
+                    self.rect.top = s.rect.bottom
+            
         # Mantem dentro da tela
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
@@ -126,6 +151,7 @@ class Raposa(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
+
 
 player= Raposa(personagem)
 all_player.add(player)
@@ -160,6 +186,30 @@ while mob < level2:
             self.speedx = 3
 
         def update(self):
+
+            for s in all_sprites_paredes:
+                if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                    if self.rect.centerx-20 > s.rect.centerx+20:
+                        self.rect.left = s.rect.right
+                    elif self.rect.centerx+20 < s.rect.centerx-20:
+                        self.rect.right = s.rect.left
+                    elif self.rect.centery-20 < s.rect.centery+20:
+                        self.rect.bottom = s.rect.top
+                    elif self.rect.centery+20 > s.rect.centery-20:
+                        self.rect.top = s.rect.bottom
+                    self.speedx = -(self.speedx)
+            for s in all_sprites_blocos:
+                if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                    if self.rect.centerx-20 > s.rect.centerx+20:
+                        self.rect.left = s.rect.right
+                    elif self.rect.centerx+20 < s.rect.centerx-20:
+                        self.rect.right = s.rect.left
+                    elif self.rect.centery-20 < s.rect.centery+20:
+                        self.rect.bottom = s.rect.top
+                    elif self.rect.centery+20 > s.rect.centery-20:
+                        self.rect.top = s.rect.bottom
+                    self.speedx = -(self.speedx)
+
             self.rect.x += self.speedx
             if self.rect.right > WIDTH:
                 self.rect.right = WIDTH
@@ -183,7 +233,7 @@ while game:
         if evento.type == pygame.QUIT: #or (evento.type == pygame.KEYDOWN and evento.key == pygame.K_ESCAPE):
             pygame.quit() # terminado a aplicação pygame
             sys.exit()    # sai pela rotina do sistema
-            
+
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_LEFT:
                 player.speedx -= 10
@@ -218,7 +268,8 @@ while game:
                 #delta["abaixo"] = 0
             '''elif evento.key == pygame.K_SPACE:
                 clique = False'''
-    all_sprites.update()
+    all_sprites_paredes.update()
+    all_sprites_blocos.update()
     all_player.update()
     all_jacare.update()
 
@@ -226,16 +277,16 @@ while game:
     if len(hits) > 0:
         game = False
 
-
     # ----- Gera saídas
-    surf.fill((0,150,0))  # Preenche com a cor branca
+    surf.fill((0,110,110))  # Preenche com a cor branca
     #surf.blit(background, (0, 0))
     # Desenhando meteoros
     for v in posicao_porta:
         porta = pygame.image.load("porta.png")
         surf.blit(porta, posicao_porta)
 
-    all_sprites.draw(surf)
+    all_sprites_paredes.draw(surf)
+    all_sprites_blocos.draw(surf)
     all_player.draw(surf)
     all_jacare.draw(surf)
 

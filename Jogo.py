@@ -18,6 +18,11 @@ blocos = pygame.image.load("bloco.png")
 personagem = pygame.image.load('Raposa_frente.gif').convert_alpha()
 jacare = pygame.image.load('jacaré.gif').convert_alpha()
 bomba = pygame.image.load('Bomba.png').convert_alpha()
+explosao = pygame.image.load('Explosao.png').convert_alpha()
+ex_cima = pygame.image.load('Ex_direita.png').convert_alpha()
+ex_baixo = pygame.image.load('Ex_esquerda.png').convert_alpha()
+ex_direita = pygame.image.load('Ex_baixo.png').convert_alpha()
+ex_esquerda = pygame.image.load('Ex_cima.png').convert_alpha()
 
 
 all_sprites_blocos = pygame.sprite.Group()
@@ -25,6 +30,10 @@ all_sprites_bombas = pygame.sprite.Group()
 all_sprites_paredes = pygame.sprite.Group()
 all_player = pygame.sprite.Group()
 all_jacare = pygame.sprite.Group()
+all_sprites_ex_c = pygame.sprite.Group()
+all_sprites_ex_b = pygame.sprite.Group()
+all_sprites_ex_d = pygame.sprite.Group()
+all_sprites_ex_e = pygame.sprite.Group()
 
 #colocar paredes
 a = []
@@ -113,8 +122,9 @@ class Raposa(pygame.sprite.Sprite):
 
         self.image = img
         self.rect = self.image.get_rect()
-        self.rect.centerx = 0
-        self.rect.top = 0
+        self.rect.centerx = 40
+        self.rect.centerx= 40
+        #self.rect.top = 0
         self.speedx = 0
         self.speedy= 0
 
@@ -210,10 +220,48 @@ class Bomba(pygame.sprite.Sprite):
         self.tempo -= 1
     def contagem (self):
         if self.tempo <= 0:
-            self.rect.x -= self.rect.width*0.1
-            self.rect.y -= self.rect.height*0.1
+            self.image= explosao
+            self.rect.centerx -= self.rect.width*0.1
+            self.rect.centery -= self.rect.height*0.1
             self.rect.width *= 1.2
             self.rect.height *= 1.2
+
+class Explosao_cima(pygame.sprite.Sprite):
+    def _init_(self, img, x, y):
+        pygame.sprite.Sprite._init_(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x + 80
+        self.rect.centery = y
+        self.tempo = 30
+
+class Explosao_baixo(pygame.sprite.Sprite):
+    def _init_(self, img, x, y):
+        pygame.sprite.Sprite._init_(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x - 80
+        self.rect.centery = y
+        self.tempo = 30
+
+class Explosao_direita(pygame.sprite.Sprite):
+    def _init_(self, img, x, y):
+        pygame.sprite.Sprite._init_(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.centery = y + 80
+        self.tempo = 30
+
+class Explosao_esquerda(pygame.sprite.Sprite):
+    def _init_(self, img, x, y):
+        pygame.sprite.Sprite._init_(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.centery = y - 80
+        self.tempo = 30
+
             
 
 
@@ -274,7 +322,12 @@ while game:
                 
                 #delta["abaixo"] = 1
             elif evento.key == pygame.K_SPACE:
-                bomba2 = Bomba(bomba, player.rect.centerx, player.rect.centery)
+                
+
+              
+
+
+                bomba2 = Bomba(bomba, (int(player.rect.centerx / 80) * 80) + 40, (int(player.rect.centery / 80) * 80) + 40)
                 all_sprites_bombas.add(bomba2)
 
         if evento.type == pygame.KEYUP:
@@ -304,6 +357,12 @@ while game:
 
     hits = pygame.sprite.groupcollide(all_sprites_bombas, all_sprites_blocos, False, False)
     for b, blocos  in hits.items():
+        for bloco in blocos:
+            bloco.kill()
+        b.kill()
+    
+    hits3 = pygame.sprite.groupcollide(all_sprites_bombas, all_jacare, False, False)
+    for b, blocos  in hits3.items():
         for bloco in blocos:
             bloco.kill()
         b.kill()

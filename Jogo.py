@@ -3,13 +3,50 @@ import random
 import os
 import sys
 
+from config import IMG_DIR, BLACK, FPS, GAME, QUIT
+
 from pygame import rect
 from pygame import image
-
 pygame.init()
+
+def init_screen(screen):
+    # Variável para o ajuste de velocidade
+    clock = pygame.time.Clock()
+
+    # Carrega o fundo da tela inicial
+    background = pygame.image.load(os.path.join(IMG_DIR, 'porta.png')).convert()
+    background_rect = background.get_rect()
+
+    running = True
+    while running:
+
+        # Ajusta a velocidade do jogo.
+        clock.tick(FPS)
+
+        # Processa os eventos (mouse, teclado, botão, etc).
+        for event in pygame.event.get():
+            # Verifica se foi fechado.
+            if event.type == pygame.QUIT:
+                state = QUIT
+                running = False
+
+            if event.type == pygame.KEYUP:
+                state = GAME
+                running = False
+
+        # A cada loop, redesenha o fundo e os sprites
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)
+
+        # Depois de desenhar tudo, inverte o display.
+        pygame.display.flip()
+
+    return True
+
+
 WIDTH=1360
 HEIGHT= 720
-game = True
+
 vitoria = True
 level = 30
 level2 = 6
@@ -30,6 +67,7 @@ ex_baixo = pygame.image.load('Ex_baixo.png').convert_alpha()
 ex_direita = pygame.image.load('Ex_direita.png').convert_alpha()
 ex_esquerda = pygame.image.load('Ex_esquerda.png').convert_alpha()
 
+game = init_screen(surf)
 
 all_sprites_blocos = pygame.sprite.Group()
 all_sprites_bombas = pygame.sprite.Group()

@@ -46,7 +46,7 @@ def init_screen(screen):
 
 WIDTH=1360
 HEIGHT= 720
-
+game = True
 vitoria = True
 level = 30
 level2 = 6
@@ -69,6 +69,7 @@ ex_esquerda = pygame.image.load('Ex_esquerda.png').convert_alpha()
 
 game = init_screen(surf)
 
+all_sprites_ex = pygame.sprite.Group()
 all_sprites_blocos = pygame.sprite.Group()
 all_sprites_bombas = pygame.sprite.Group()
 all_sprites_paredes = pygame.sprite.Group()
@@ -123,7 +124,7 @@ i = 80
 while i < 1360: #lista das posicoes
     x.append(i)
     i = i + 80
-i = 80
+i = 0
 while i < 720:
     y.append(i)
     i = i + 80
@@ -221,7 +222,7 @@ class Ini(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = ale[0] +40
         self.rect.bottom = ale[1] -9
-        self.speedx = 3
+        self.speedx = -3
 
     def update(self):
 
@@ -237,6 +238,17 @@ class Ini(pygame.sprite.Sprite):
                     self.rect.top = s.rect.bottom
                 self.speedx = -(self.speedx)
         for s in all_sprites_blocos:
+            if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
+                if self.rect.centerx-20 > s.rect.centerx+20:
+                    self.rect.left = s.rect.right
+                elif self.rect.centerx+20 < s.rect.centerx-20:
+                    self.rect.right = s.rect.left
+                elif self.rect.centery-20 < s.rect.centery+20:
+                    self.rect.bottom = s.rect.top
+                elif self.rect.centery+20 > s.rect.centery-20:
+                    self.rect.top = s.rect.bottom
+                self.speedx = -(self.speedx)       
+        for s in all_sprites_bombas:
             if self.rect.right > s.rect.left and self.rect.left < s.rect.right and self.rect.bottom > s.rect.top and self.rect.top < s.rect.bottom:
                 if self.rect.centerx-20 > s.rect.centerx+20:
                     self.rect.left = s.rect.right
@@ -268,10 +280,11 @@ class Bomba(pygame.sprite.Sprite):
     def update(self):
         self.tempo -= 1
     def contagem (self):
-        if self.tempo == 30:
+        if self.tempo == 32:
             self.image= explosao
+            self.add(all_sprites_ex)
         if self.tempo <= 0:
-            self.image = fake
+            self.kill()
 
 class Explosao_cima(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
@@ -279,43 +292,40 @@ class Explosao_cima(pygame.sprite.Sprite):
         self.image = img
         self.rect = self.image.get_rect()
         self.rect.centerx = x 
-        self.rect.centery = y 
+        self.rect.centery = y -80
         self.tempo = 90
     def update(self):
         self.tempo -= 1
     def contagem (self):
         if self.tempo == 30:
             self.image= ex_cima
-            self.rect.centerx += -40
-            self.rect.centery += -120
+            self.add(all_sprites_ex)
         if self.tempo <= 0:
-            self.image = fake
-        
+            self.kill() 
 
 class Explosao_baixo(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
-        self.rect.centerx = x
-        self.rect.centery = y 
+        self.rect.centerx = x 
+        self.rect.centery = y +80
         self.tempo = 90
     def update(self):
         self.tempo -= 1
     def contagem (self):
         if self.tempo == 30:
             self.image= ex_baixo
-            self.rect.centerx += -40
-            self.rect.centery += 40
+            self.add(all_sprites_ex)
         if self.tempo <= 0:
-            self.image = fake
+            self.kill()
 
 class Explosao_direita(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
-        self.rect.centerx = x 
+        self.rect.centerx = x +80
         self.rect.centery = y 
         self.tempo = 90
     def update(self):
@@ -323,17 +333,16 @@ class Explosao_direita(pygame.sprite.Sprite):
     def contagem (self):
         if self.tempo == 30:
             self.image= ex_direita
-            self.rect.centerx += 40
-            self.rect.centery += -40
+            self.add(all_sprites_ex)
         if self.tempo <= 0:
-            self.image = fake
+            self.kill()
 
 class Explosao_esquerda(pygame.sprite.Sprite):
     def __init__(self, img, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
-        self.rect.centerx = x 
+        self.rect.centerx = x -80
         self.rect.centery = y 
         self.tempo = 90
     def update(self):
@@ -341,10 +350,9 @@ class Explosao_esquerda(pygame.sprite.Sprite):
     def contagem (self):
         if self.tempo == 30:
             self.image= ex_esquerda
-            self.rect.centerx += -120
-            self.rect.centery += -40
+            self.add(all_sprites_ex)
         if self.tempo <= 0:
-            self.image = fake
+            self.kill()
 
 
 
@@ -455,32 +463,22 @@ while game:
     for b in all_sprites_ex_b.sprites():
         b.contagem()
 
-    hits_b = pygame.sprite.groupcollide(all_sprites_ex_b, all_sprites_blocos, False, False)
-    for b, blocos  in hits_b.items():
-        for bloco in blocos:
-            bloco.kill()
-        b.kill()
-    hits_c = pygame.sprite.groupcollide(all_sprites_ex_c, all_sprites_blocos, False, False)
-    for b, blocos  in hits_c.items():
-        for bloco in blocos:
-            bloco.kill()
-        b.kill()
-    hits_d = pygame.sprite.groupcollide(all_sprites_ex_d, all_sprites_blocos, True, False)
-    for b, blocos  in hits_d.items():
-        for bloco in blocos:
-            bloco.kill()
-        b.kill()
-    hits_e = pygame.sprite.groupcollide(all_sprites_ex_e, all_sprites_blocos, False, False)
+    hits_e = pygame.sprite.groupcollide(all_sprites_ex, all_sprites_blocos, False, False)
     for b, blocos  in hits_e.items():
         for bloco in blocos:
             bloco.kill()
         b.kill()
-
-    hits_cp = pygame.sprite.groupcollide(all_sprites_ex_c, all_sprites_paredes, True, False)
-    hits_cb = pygame.sprite.groupcollide(all_sprites_ex_b, all_sprites_paredes, True, False)
-    hits_cd = pygame.sprite.groupcollide(all_sprites_ex_d, all_sprites_paredes, True, False)
-    hits_ce = pygame.sprite.groupcollide(all_sprites_ex_e, all_sprites_paredes, True, False)
     
+    hits_bj = pygame.sprite.groupcollide(all_sprites_ex, all_jacare, False, False)
+    for b, blocos  in hits_bj.items(): 
+        for bloco in blocos:
+            bloco.kill()
+
+    hits_cp = pygame.sprite.groupcollide(all_sprites_ex, all_sprites_paredes, True, False)
+    hits_bp = pygame.sprite.groupcollide(all_sprites_ex, all_player, False, False, pygame.sprite.collide_rect_ratio(0.85))
+    if len(hits_bp) > 0:
+        game = False
+
     hits = pygame.sprite.spritecollide(player, all_jacare, True)
     if len(hits) > 0:
         game = False
@@ -492,7 +490,7 @@ while game:
 
     surf.fill((0,110,110))
     
-
+    all_sprites_ex.draw(surf)
     all_porta.draw(surf)
     all_sprites_paredes.draw(surf)
     all_sprites_bombas.draw(surf)

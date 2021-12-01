@@ -66,8 +66,14 @@ ex_cima = pygame.image.load('Ex_cima.png').convert_alpha()
 ex_baixo = pygame.image.load('Ex_baixo.png').convert_alpha()
 ex_direita = pygame.image.load('Ex_direita.png').convert_alpha()
 ex_esquerda = pygame.image.load('Ex_esquerda.png').convert_alpha()
-Passos = os.path.join("Passos.wav")
+
+Passos = pygame.mixer.Sound(os.path.join("Passos.wav"))
 Explo = pygame.mixer.Sound(os.path.join("assets", "img", "expl3.wav"))
+musica = os.path.join("musica.ogg")
+pygame.mixer.music.load(musica)
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1)
+
 
 game = init_screen(surf)
 
@@ -403,20 +409,16 @@ while game:
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_LEFT:
                 player.speedx -= 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.play(0)
+                Passos.play()
             elif evento.key == pygame.K_RIGHT:
                 player.speedx+=10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.play(0)
+                Passos.play()
             elif evento.key == pygame.K_UP:
                 player.speedy -= 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.play(0)
+                Passos.play()
             elif evento.key == pygame.K_DOWN:
                 player.speedy += 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.play(0)
+                Passos.play()
             elif evento.key == pygame.K_SPACE:
                 
                 ex_c = Explosao_cima(fake, (int(player.rect.centerx / 80) * 80) + 40, (int(player.rect.centery / 80) * 80) + 40)
@@ -433,20 +435,13 @@ while game:
         if evento.type == pygame.KEYUP:
             if evento.key == pygame.K_LEFT:
                 player.speedx += 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.pause()
-            if evento.key == pygame.K_RIGHT:
-                player.speedx -= 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.pause()
+            elif evento.key == pygame.K_RIGHT:
+                player.speedx -= 10            
             elif evento.key == pygame.K_UP:
-                player.speedy += 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.pause()
+                player.speedy += 10              
             elif evento.key == pygame.K_DOWN:
                 player.speedy -= 10
-                pygame.mixer.music.load(Passos)
-                pygame.mixer.music.pause()
+            Passos.stop()
 
     all_porta.update()
     all_player.update()

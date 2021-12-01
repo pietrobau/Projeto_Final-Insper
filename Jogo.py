@@ -66,6 +66,7 @@ ex_cima = pygame.image.load('Ex_cima.png').convert_alpha()
 ex_baixo = pygame.image.load('Ex_baixo.png').convert_alpha()
 ex_direita = pygame.image.load('Ex_direita.png').convert_alpha()
 ex_esquerda = pygame.image.load('Ex_esquerda.png').convert_alpha()
+Passos = os.path.join("Passos.wav")
 
 game = init_screen(surf)
 
@@ -400,18 +401,20 @@ while game:
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_LEFT:
                 player.speedx -= 10
-                #delta["esquerda"] = 1
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.play(0)
             elif evento.key == pygame.K_RIGHT:
                 player.speedx+=10
-                #delta["direita"] = 1
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.play(0)
             elif evento.key == pygame.K_UP:
                 player.speedy -= 10
-                
-                #delta["acima"] = 1
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.play(0)
             elif evento.key == pygame.K_DOWN:
                 player.speedy += 10
-                
-                #delta["abaixo"] = 1
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.play(0)
             elif evento.key == pygame.K_SPACE:
                 
                 ex_c = Explosao_cima(fake, (int(player.rect.centerx / 80) * 80) + 40, (int(player.rect.centery / 80) * 80) + 40)
@@ -428,19 +431,21 @@ while game:
         if evento.type == pygame.KEYUP:
             if evento.key == pygame.K_LEFT:
                 player.speedx += 10
-                #delta["esquerda"] = 0
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.pause()
             if evento.key == pygame.K_RIGHT:
                 player.speedx -= 10
-                #delta["direita"] = 0
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.pause()
             elif evento.key == pygame.K_UP:
                 player.speedy += 10
-                #delta["acima"] = 0
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.pause()
             elif evento.key == pygame.K_DOWN:
                 player.speedy -= 10
-                
-                #delta["abaixo"] = 0
-            '''elif evento.key == pygame.K_SPACE:
-                clique = False'''
+                pygame.mixer.music.load(Passos)
+                pygame.mixer.music.pause()
+
     all_porta.update()
     all_player.update()
     all_jacare.update()

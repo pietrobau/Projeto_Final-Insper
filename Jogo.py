@@ -67,6 +67,7 @@ ex_baixo = pygame.image.load('Ex_baixo.png').convert_alpha()
 ex_direita = pygame.image.load('Ex_direita.png').convert_alpha()
 ex_esquerda = pygame.image.load('Ex_esquerda.png').convert_alpha()
 Passos = os.path.join("Passos.wav")
+Explo = pygame.mixer.Sound(os.path.join("assets", "img", "expl3.wav"))
 
 game = init_screen(surf)
 
@@ -284,6 +285,7 @@ class Bomba(pygame.sprite.Sprite):
         if self.tempo == 32:
             self.image= explosao
             self.add(all_sprites_ex)
+            Explo.play()
         if self.tempo <= 0:
             self.kill()
 

@@ -42,29 +42,76 @@ def init_screen(screen):
         pygame.display.flip()
 
     return True
+
+def init_screen2(screen):
+    # Variável para o ajuste de velocidade
+    clock = pygame.time.Clock()
+    # Carrega o fundo da tela inicial
+    background = pygame.image.load(os.path.join(IMG_DIR, 'Game_over.png')).convert()
+    background_rect = background.get_rect()
+    running = True
+    while running:
+        # Ajusta a velocidade do jogo.
+        clock.tick(FPS)
+        # Processa os eventos (mouse, teclado, botão, etc).
+        for event in pygame.event.get():
+            # Verifica se foi fechado.
+            if event.type == pygame.QUIT:
+                state = QUIT
+                running = False
+            if event.type == pygame.KEYUP:
+                state = GAME
+                running = False
+        # A cada loop, redesenha o fundo e os sprites
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)
+        # Depois de desenhar tudo, inverte o display.
+        pygame.display.flip()
+    return state
+
+def init_screen3(screen):
+    # Variável para o ajuste de velocidade
+    clock = pygame.time.Clock()
+    # Carrega o fundo da tela inicial
+    background = pygame.image.load(os.path.join(IMG_DIR, 'Next_level.png')).convert()
+    background_rect = background.get_rect()
+    running = True
+    while running:
+        # Ajusta a velocidade do jogo.
+        clock.tick(FPS)
+        # Processa os eventos (mouse, teclado, botão, etc).
+        for event in pygame.event.get():
+            # Verifica se foi fechado.
+            if event.type == pygame.QUIT:
+                state = QUIT
+                running = False
+            if event.type == pygame.KEYUP:
+                state = GAME
+                running = False
+        # A cada loop, redesenha o fundo e os sprites
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)
+        # Depois de desenhar tudo, inverte o display.
+        pygame.display.flip()
+    return state
+
 oi = True
 
 vitoria = False
+game = True
+perdeu= False
 
 while oi:
-
     WIDTH=1360
-
     HEIGHT= 720
-
-    game = True
-
+    
     if vitoria == False:
-
         level = 30
-
         level2 = 6
-
     if vitoria == True:
-
         level += 10
-
         level2 += 5
+        
     pygame.display.set_caption('BomberFox')
     surf= pygame.display.set_mode([WIDTH,HEIGHT])
     surf.fill([0,110,110])
@@ -89,8 +136,14 @@ while oi:
     pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
 
-
-    game = init_screen(surf)
+    if vitoria == True:
+        game= init_screen3(surf)
+    elif perdeu == False:
+        game = init_screen(surf)
+    if perdeu == True:
+        game = init_screen2(surf)
+        game = init_screen(surf)
+    
 
     all_sprites_ex = pygame.sprite.Group()
     all_sprites_blocos = pygame.sprite.Group()
@@ -495,16 +548,21 @@ while oi:
         hits_bp = pygame.sprite.groupcollide(all_sprites_ex, all_player, False, False, pygame.sprite.collide_rect_ratio(0.85))
         if len(hits_bp) > 0:
             game = False
+            vitoria= False
+            perdeu= True
 
         hits = pygame.sprite.spritecollide(player, all_jacare, True)
         if len(hits) > 0:
             vitoria = False
             game = False
+            perdeu= True
+
 
         hits2 = pygame.sprite.spritecollide(player, all_porta, False)
         if len(hits2) > 0:
             vitoria = True
             game = False
+            perdeu=False
 
 
         surf.fill((0,110,110))

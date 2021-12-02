@@ -43,13 +43,28 @@ def init_screen(screen):
 
     return True
 oi = True
+
+vitoria = False
+
 while oi:
+
     WIDTH=1360
+
     HEIGHT= 720
+
     game = True
-    vitoria = True
-    level = 30
-    level2 = 6
+
+    if vitoria == False:
+
+        level = 30
+
+        level2 = 6
+
+    if vitoria == True:
+
+        level += 10
+
+        level2 += 5
     pygame.display.set_caption('BomberFox')
     surf= pygame.display.set_mode([WIDTH,HEIGHT])
     surf.fill([0,110,110])
@@ -71,7 +86,7 @@ while oi:
     Explo = pygame.mixer.Sound(os.path.join("assets", "img", "expl3.wav"))
     musica = os.path.join("musica.ogg")
     pygame.mixer.music.load(musica)
-    pygame.mixer.music.set_volume(0)
+    pygame.mixer.music.set_volume(0.1)
     pygame.mixer.music.play(-1)
 
 
@@ -483,13 +498,12 @@ while oi:
 
         hits = pygame.sprite.spritecollide(player, all_jacare, True)
         if len(hits) > 0:
-            level = 30
-            level2 = 6
+            vitoria = False
             game = False
+
         hits2 = pygame.sprite.spritecollide(player, all_porta, False)
         if len(hits2) > 0:
-            level += 10
-            level2 += 10
+            vitoria = True
             game = False
 
 
